@@ -1,0 +1,23 @@
+FACTOR-Bench — License
+
+ANNOTATIONS
+-----------
+The FACTOR-Bench annotations (captions, labels, oracle parses, and all metadata
+in factor_bench.json / factor_bench.jsonl) are released under the
+Creative Commons Attribution 4.0 International License (CC-BY-4.0):
+
+    https://creativecommons.org/licenses/by/4.0/
+
+You are free to share and adapt the material for any purpose, provided you give
+appropriate credit. Please cite the paper (see README.md / DATACARD.md).
+
+IMAGES
+------
+FACTOR-Bench does NOT distribute images. It references images from the COCO
+val2017 dataset by id and relative path (val2017/<id>.jpg). COCO images are
+subject to the COCO terms of use and the Flickr terms of the underlying
+photographs:
+
+    https://cocodataset.org/#termsofuse
+
+Obtain images from https://cocodataset.org/#download .

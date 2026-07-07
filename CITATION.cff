@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use FACTOR-Bench, please cite the paper below."
+title: "FACTOR-Bench"
+authors:
+  - family-names: Alshehri
+    given-names: Sultan
+  - family-names: Yang
+    given-names: Zhantao
+  - family-names: Zhang
+    given-names: Han
+  - family-names: Savvides
+    given-names: Marios
+license: CC-BY-4.0
+url: "https://sultanmo.github.io/factored-vlm/"
+repository-code: "https://github.com/SultanMo/factored-vlm"
+preferred-citation:
+  type: conference-paper
+  title: "Similarity Is Not Logic: Factored Inference for Dual-Encoder Vision-Language Models"
+  authors:
+    - family-names: Alshehri
+      given-names: Sultan
+    - family-names: Yang
+      given-names: Zhantao
+    - family-names: Zhang
+      given-names: Han
+    - family-names: Savvides
+      given-names: Marios
+  collection-title: "International Conference on Machine Learning (ICML)"
+  year: 2026

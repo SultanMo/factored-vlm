@@ -1,0 +1,8 @@
+# Core (evaluate() itself is dependency-free; these are for the reference scorers)
+torch>=2.0
+numpy>=1.24
+Pillow>=9.0
+open_clip_torch>=2.24
+
+# For --scorer paper_lcse (exact paper reproduction), additionally:
+#   pip install git+https://github.com/openai/CLIP.git
