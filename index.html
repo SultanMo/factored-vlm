@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="Similarity Is Not Logic: Factored Inference for Dual-Encoder Vision-Language Models">
+  <meta name="description" content="A training-free fix for CLIP-style models on Boolean queries. LCSE reaches 85.5% on FACTOR-Bench vs 73.2% best fine-tuned baseline, while preserving zero-shot retrieval. ICML 2026.">
+  <meta name="keywords" content="CLIP, SigLIP, vision-language models, compositionality, negation, Boolean operators, training-free, image-text retrieval, FACTOR-Bench, ICML 2026">
+  <meta name="author" content="Sultan Alshehri, Zhantao Yang, Han Zhang, Marios Savvides">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="FACTOR-Bench / LCSE">
+  <meta property="og:title" content="Similarity Is Not Logic: Factored Inference for Dual-Encoder VLMs">
+  <meta property="og:description" content="A training-free fix for CLIP-style models on Boolean queries. 73.2% to 85.5% on FACTOR-Bench. ICML 2026.">
+  <meta property="og:url" content="https://sultanmo.github.io/factored-vlm/">
+  <meta property="og:image" content="https://sultanmo.github.io/factored-vlm/static/images/teaser.png">
+  <meta property="og:image:alt" content="CLIP-style retrieval models violate compositional constraints">
+  <meta property="article:author" content="Sultan Alshehri">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Similarity Is Not Logic: Factored Inference for Dual-Encoder VLMs (ICML 2026)">
+  <meta name="twitter:description" content="A training-free fix for CLIP-style models on Boolean queries. 73.2 to 85.5% on FACTOR-Bench.">
+  <meta name="twitter:image" content="https://sultanmo.github.io/factored-vlm/static/images/teaser.png">
+  <meta name="twitter:image:alt" content="CLIP-style retrieval models violate compositional constraints">
+
+  <!-- Academic / Google Scholar -->
+  <meta name="citation_title" content="Similarity Is Not Logic: Factored Inference for Dual-Encoder Vision-Language Models">
+  <meta name="citation_author" content="Alshehri, Sultan">
+  <meta name="citation_author" content="Yang, Zhantao">
+  <meta name="citation_author" content="Zhang, Han">
+  <meta name="citation_author" content="Savvides, Marios">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="International Conference on Machine Learning (ICML)">
+  <meta name="citation_pdf_url" content="https://sultanmo.github.io/factored-vlm/static/pdfs/paper.pdf">
+
+  <meta name="theme-color" content="#2563eb">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>Similarity Is Not Logic: Factored Inference for Dual-Encoder VLMs (ICML 2026)</title>
+
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="apple-touch-icon" href="static/images/favicon.ico">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- MathJax for inline math -->
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "Similarity Is Not Logic: Factored Inference for Dual-Encoder Vision-Language Models",
+    "description": "A training-free fix for CLIP-style models on Boolean queries via Logic-Constrained Score Editing (LCSE). 85.5% on FACTOR-Bench versus 73.2% best fine-tuned baseline.",
+    "author": [
+      { "@type": "Person", "name": "Sultan Alshehri", "affiliation": { "@type": "Organization", "name": "Carnegie Mellon University" } },
+      { "@type": "Person", "name": "Zhantao Yang", "affiliation": { "@type": "Organization", "name": "Carnegie Mellon University" } },
+      { "@type": "Person", "name": "Han Zhang",    "affiliation": { "@type": "Organization", "name": "Carnegie Mellon University" } },
+      { "@type": "Person", "name": "Marios Savvides", "affiliation": { "@type": "Organization", "name": "Carnegie Mellon University" } }
+    ],
+    "datePublished": "2026",
+    "publisher": { "@type": "Organization", "name": "International Conference on Machine Learning (ICML)" },
+    "url": "https://sultanmo.github.io/factored-vlm/",
+    "image": "https://sultanmo.github.io/factored-vlm/static/images/teaser.png",
+    "keywords": ["CLIP", "SigLIP", "vision-language models", "compositionality", "negation", "Boolean operators", "training-free", "image-text retrieval", "FACTOR-Bench"],
+    "isAccessibleForFree": true,
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  }
+  </script>
+</head>
+<body>
+
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+
+            <h1 class="title is-1 publication-title">
+              Similarity Is Not Logic:<br>Factored Inference for Dual-Encoder Vision-Language Models
+            </h1>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Sultan Alshehri<sup>1</sup>,</span>
+              <span class="author-block">Zhantao Yang<sup>1</sup>,</span>
+              <span class="author-block">Han Zhang<sup>1</sup>,</span>
+              <span class="author-block">Marios Savvides<sup>1</sup></span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup>Carnegie Mellon University</span>
+              <br>
+              <span class="author-block"><strong>ICML 2026</strong></span>
+            </div>
+
+            <div class="has-text-centered" style="margin-top: 1.2em; margin-bottom: 1.0em;">
+              <div style="display: inline-block; max-width: 44em; text-align: left;
+                    background-color: #f8fafc; border-left: 4px solid #ef4444;
+                    padding: 0.85em 1.15em; border-radius: 4px; line-height: 1.6;">
+                <strong>TL;DR:</strong> Dual-encoder VLMs fail compositional constraints
+                (negation, conjunction, etc.) as similarity approximates mean-pooling over
+                concepts. Our method extracts atomic evidence via frozen encoders and
+                executes compositional constraints externally.
+              </div>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+
+                <span class="link-block">
+                  <a href="static/pdfs/paper.pdf" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="static/pdfs/poster.pdf" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-image"></i></span>
+                    <span>Poster</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://icml.cc/virtual/2026/poster/65419" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-globe"></i></span>
+                    <span>ICML 2026</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://github.com/SultanMo/factored-vlm" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>Code &amp; Benchmark</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://huggingface.co/datasets/sulmo/FACTOR-Bench" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-database"></i></span>
+                    <span>Dataset</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="#BibTeX"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-quote-right"></i></span>
+                    <span>BibTeX</span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End hero -->
+
+
+  <!-- Teaser figure -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <img src="static/images/teaser.png"
+             alt="CLIP-style retrieval models violate compositional constraints. Negation and exclusion queries retrieve excluded concepts; conjunctions miss required concepts. LCSE reduces these failures while preserving standard retrieval."
+             style="width: 100%; height: auto;">
+        <h2 class="subtitle has-text-centered" style="margin-top: 0.8em;">
+          <strong>CLIP-style retrieval models violate compositional constraints.</strong>
+          Negation and exclusion queries retrieve excluded concepts, and conjunctions miss
+          required concepts. CLIP and its composition-aware and negation-aware variants show
+          unreliable top-1 retrieval results. LCSE reduces these failures while preserving
+          standard retrieval performance.
+        </h2>
+      </div>
+    </div>
+  </section>
+  <!-- End teaser -->
+
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Dual-encoder vision&ndash;language models (VLMs) expose a similarity interface
+              that enables zero-shot retrieval but fails compositional constraints: queries
+              like &ldquo;umbrella and no person&rdquo; retrieve images containing both, even
+              when concept detection is reliable. We trace this to an interface-level
+              <strong>Bag-of-Concepts</strong> effect, where similarity scores approximate
+              mean pooling of concept evidence regardless of operators; although
+              operator-dependent signals exist in text embeddings, they are too weak or
+              misaligned to affect rankings. Fine-tuning does not reliably resolve this
+              failure because the dominant bottleneck is how similarity aggregates evidence
+              rather than what encoders represent. We propose <strong>factored inference</strong>,
+              which separates evidence extraction from constraint execution, and introduce
+              <strong>LCSE</strong> (Logic-Constrained Score Editing), a training-free method
+              that executes constraints externally using concept scores from frozen encoders.
+              We also introduce <strong>FACTOR-Bench</strong>, where LCSE achieves
+              <strong>85.5%</strong> accuracy versus 73.2% for the best fine-tuned baseline,
+              <strong>90.7%</strong> when applied to SigLIP&nbsp;2, and improves NegBench COCO MCQ
+              accuracy from 27.2% to <strong>65.2%</strong> while preserving retrieval performance.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End abstract -->
+
+
+  <!-- The Problem -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">The Problem: Bag-of-Concepts Scoring</h2>
+          <div class="content has-text-justified">
+            <p>
+              Across models we study, image&ndash;text similarity behaves like a soft pool of
+              atomic concept evidence: scores track <em>which</em> concepts are mentioned,
+              not <em>how</em> they are combined. Anti-monotone operators (negation,
+              exclusion) are systematically inverted under dot-product scoring even though
+              operator-dependent directions exist in the text embedding. Swapping
+              &ldquo;and&rdquo; for &ldquo;or&rdquo; barely changes rankings, while swapping
+              concepts changes them substantially.
+            </p>
+          </div>
+
+          <div class="columns is-centered" style="margin-top: 1.0em;">
+            <div class="column">
+              <figure class="image">
+                <img src="static/images/quadrant.png"
+                     alt="Heatmap showing holistic scoring inverts anti-monotone operators">
+              </figure>
+              <p class="has-text-centered is-size-7" style="margin-top: 0.5em;">
+                <strong>Holistic scoring inverts anti-monotone operators.</strong>
+                $\lnot A \land \lnot B$ should prefer <em>Neither</em>, but <em>never</em> does (0%).
+                $\lnot A$ prefers images containing $A$ for 91% of pairs.
+              </p>
+            </div>
+            <div class="column">
+              <figure class="image">
+                <img src="static/images/sensitivity.png"
+                     alt="Operators have weak effect on rankings while content words dominate">
+              </figure>
+              <p class="has-text-centered is-size-7" style="margin-top: 0.5em;">
+                <strong>Content words dominate; operators have weak effect.</strong>
+                Swapping <code>and</code> &harr; <code>or</code> preserves rankings
+                ($\rho \approx 0.93$); swapping concepts reorders them ($\rho \approx 0.64$).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End The Problem -->
+
+
+  <!-- Method -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Method: Logic-Constrained Score Editing (LCSE)</h2>
+          <div class="content has-text-justified">
+            <p>
+              <strong>Factored inference</strong> separates <em>evidence extraction</em> from
+              <em>constraint execution</em>. Given a parsed query (concepts, polarities,
+              operator), we extract a per-concept calibrated probability from the frozen
+              VLM via a small template ensemble, then aggregate these probabilities
+              externally according to the operator semantics (harmonic mean for AND,
+              soft-max for OR, arithmetic mean otherwise), with polarity flips for
+              negated concepts.
+            </p>
+            <p>
+              The <strong>LCSE score edit</strong> adjusts the original similarity only
+              when the operator implies non-mean aggregation and leaves non-constraint
+              queries untouched:
+            </p>
+            <p class="has-text-centered" style="font-size: 1.15em;">
+              $s_{\text{LCSE}} \;=\; s_{\text{hol}} \;+\; \frac{1}{\beta}\!\left[\,
+              \mathrm{logit}(p_{\text{logical}}) - \mathrm{logit}(p_{\text{soft}}) \,\right]$
+            </p>
+            <p>
+              where $s_{\text{hol}}$ is the standard image&ndash;text cosine,
+              $p_{\text{logical}}$ is the polarity-adjusted aggregation under the parsed
+              operator, $p_{\text{soft}}$ is the arithmetic mean of raw calibrated concept
+              probabilities, and $\beta$ is the calibration slope. The edit is zero when
+              the query has no operator structure, so standard retrieval performance is
+              preserved by construction.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End Method -->
+
+
+  <!-- Results -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Results</h2>
+
+          <div class="content has-text-justified">
+            <p>
+              On <strong>FACTOR-Bench</strong> (operator split, 1,100 samples), LCSE with
+              frozen CLIP ViT-B/32 reaches <strong>85.5%</strong>, versus 58.3% for holistic
+              CLIP and 73.2% for the best fine-tuned baseline. Applied to a stronger
+              backbone (SigLIP&nbsp;2), LCSE reaches <strong>90.7%</strong>. On
+              <strong>NegBench COCO MCQ</strong>, LCSE lifts SigLIP&nbsp;2 from 27.2% to
+              <strong>65.2%</strong>. Standard retrieval is preserved: COCO R@5 changes
+              by 0.1 point (55.3% &rarr; 55.2%) and rank correlation $\rho = 0.999$.
+            </p>
+          </div>
+
+          <div class="table-container">
+            <table class="table is-fullwidth is-hoverable">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Backbone</th>
+                  <th class="has-text-right">FACTOR-Bench&nbsp;(%)</th>
+                  <th class="has-text-right">NegBench&nbsp;MCQ&nbsp;(%)</th>
+                  <th class="has-text-right">COCO&nbsp;R@5&nbsp;(%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Holistic CLIP</td>
+                  <td>ViT-B/32</td>
+                  <td class="has-text-right">58.3</td>
+                  <td class="has-text-right">39.3</td>
+                  <td class="has-text-right">55.3</td>
+                </tr>
+                <tr>
+                  <td>Best fine-tuned baseline</td>
+                  <td>ViT-B/32</td>
+                  <td class="has-text-right">73.2</td>
+                  <td class="has-text-right">56.2</td>
+                  <td class="has-text-right">&mdash;</td>
+                </tr>
+                <tr style="background-color: #e8f0fe;">
+                  <td><strong>LCSE (ours)</strong></td>
+                  <td>ViT-B/32</td>
+                  <td class="has-text-right"><strong>85.5</strong></td>
+                  <td class="has-text-right"><strong>60.3</strong></td>
+                  <td class="has-text-right">55.2</td>
+                </tr>
+                <tr style="background-color: #e8f0fe;">
+                  <td><strong>LCSE (ours)</strong></td>
+                  <td>SigLIP&nbsp;2</td>
+                  <td class="has-text-right"><strong>90.7</strong></td>
+                  <td class="has-text-right"><strong>65.2</strong></td>
+                  <td class="has-text-right">73.5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="is-size-7 has-text-centered">
+            <em>Headline results. &ldquo;Best fine-tuned baseline&rdquo; is the column-wise
+            best (NegationCLIP on FACTOR-Bench, NegCLIP-NegFull on NegBench MCQ). Full
+            per-operator breakdown, ablations, and stratification analysis in the paper.</em>
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End Results -->
+
+
+  <!-- FACTOR-Bench -->
+  <section class="section hero is-light" id="factor-bench">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">FACTOR-Bench</h2>
+
+          <div class="content has-text-justified">
+            <p>
+              <strong>FACTOR-Bench</strong> is a diagnostic benchmark that
+              measures whether a vision&ndash;language
+              <em>scoring interface</em> executes Boolean operators (negation,
+              conjunction, disjunction, exclusion, NOR) or merely tracks
+              which concepts are mentioned.
+            </p>
+            <ul>
+              <li><strong>1,695 samples</strong> built from COCO val2017, all OWL-ViT-validated.</li>
+              <li><strong>Three splits</strong>: <em>operator</em> (1,100; NOT/AND/OR/BUT_NOT/NEITHER),
+                <em>equivalence</em> (450; De Morgan / double-negation / commutativity), and
+                <em>compound</em> (145; 3&ndash;4 concepts, mixed polarity).</li>
+              <li><strong>Two-alternative forced choice</strong>: same concepts, different
+                operators. A model that scores them alike reveals bag-of-concepts behavior.</li>
+              <li><strong>Oracle parses embedded</strong> in every sample, so evaluation is
+                independent of any text parser.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End FACTOR-Bench -->
+
+
+  <!-- BibTeX -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@inproceedings{alshehri2026similarity,
+  title     = {Similarity Is Not Logic: Factored Inference for Dual-Encoder Vision-Language Models},
+  author    = {Alshehri, Sultan and Yang, Zhantao and Zhang, Han and Savvides, Marios},
+  booktitle = {International Conference on Machine Learning (ICML)},
+  year      = {2026}
+}</code></pre>
+    </div>
+  </section>
+  <!-- End BibTeX -->
+
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              Correspondence:
+              <a href="mailto:salshehr@andrew.cmu.edu">salshehr@andrew.cmu.edu</a>.
+            </p>
+            <p>
+              This page was built using the
+              <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>,
+              which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              You are free to borrow the source code of this website; please link back to the
+              template in the footer. This website is licensed under a
+              <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+              Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
