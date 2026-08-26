@@ -163,9 +163,3 @@ sample per operator (Overall matches for all columns).
   year      = {2026}
 }
 ```
-
-## Contact
-
-Questions and issues are welcome on the
-[issue tracker](https://github.com/SultanMo/factored-vlm/issues), or by email:
-salshehr@andrew.cmu.edu.
